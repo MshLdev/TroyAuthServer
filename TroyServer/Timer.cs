@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-namespace TroyAuthServer
+namespace TroyServer
 {
     class Timer
     {

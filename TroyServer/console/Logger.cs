@@ -1,6 +1,6 @@
 using Microsoft.VisualBasic;
 
-namespace TroyAuthServer
+namespace TroyServer
 {
     class Logger
     {
@@ -25,7 +25,7 @@ namespace TroyAuthServer
             string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Served Event. " + info;
             genericfileLog(logmsg);
 
-            if(Auth.isLogger == "false")
+            if(Server.isLogger == "false")
                 return;
 
             Printer.TypeLine("[System::", ConsoleColor.DarkYellow);
@@ -39,7 +39,7 @@ namespace TroyAuthServer
         {
             string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Asked Empty Request.";
             genericfileLog(logmsg);
-            if(Auth.isLogger == "false")
+            if(Server.isLogger == "false")
                 return;
 
             Printer.TypeLine("[System::", ConsoleColor.DarkYellow);
@@ -53,7 +53,7 @@ namespace TroyAuthServer
         {
             string logmsg = "[[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Request not listed on Auth Enum! REQ.ID == ." + info;
             genericfileLog(logmsg);
-            if(Auth.isLogger == "false")
+            if(Server.isLogger == "false")
                 return;
 
             Printer.TypeLine("[System::", ConsoleColor.DarkYellow);
@@ -67,7 +67,7 @@ namespace TroyAuthServer
         {
             string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Packet was Damaged " + info;
             genericfileLog(logmsg);
-            if(Auth.isLogger == "false")
+            if(Server.isLogger == "false")
                 return;
 
             Printer.TypeLine("[System::", ConsoleColor.DarkYellow);
