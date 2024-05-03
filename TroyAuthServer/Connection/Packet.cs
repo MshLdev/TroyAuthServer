@@ -7,15 +7,17 @@ namespace TroyAuthServer
 {
     class Packet
     {
-
-
         //Whenever a new Packet has been recieved to the client
-        public static uint clientRecived(ref Client current,ref dbController db)
+        public static Auth.REQUEST clientRecived(ref Client current,ref dbController db)
         {
             //Packet was empty somehow
             //nothing left to do....
-            if(current.buffSize == 0)
-                return (uint)Auth.REQUEST.PACKET_EMPTY_REQUEST;
+            if(current.buffSize < 10)   
+            {
+                current.request(Auth.REQUEST.PACKET_EMPTY_REQUEST);
+                return Auth.REQUEST.PACKET_EMPTY_REQUEST;
+            }
+                
                 
 
             //Copy just the lenght of the last packet to our Buffer
@@ -29,11 +31,15 @@ namespace TroyAuthServer
             //Make sure packet size matches the Size Client
             //Intended!!
             if(current.buffSize != sizeDeclared)
-                return (uint)Auth.REQUEST.PACKET_DAMAGED_REQUEST;
+            {
+                current.request(Auth.REQUEST.PACKET_DAMAGED_REQUEST);
+                return Auth.REQUEST.PACKET_DAMAGED_REQUEST;
+            }
+                
 
 
             //Second uint32 in header is always Type
-            uint request = getUint32AtIndex(ref recBuf, 4);   
+            Auth.REQUEST request = (Auth.REQUEST)getUint32AtIndex(ref recBuf, 4);   
             current.lastRequest = request;
             //Printer.Write("::Packet Debug::\n[" + current.buffSize + "/" + sizeDeclared + " = size]\n[" + request + " = " + (Auth.REQUEST)request + "]", ConsoleColor.DarkMagenta);
 
@@ -44,7 +50,8 @@ namespace TroyAuthServer
             {
                 //Client requested SessionID
                 //we need to 1)recive login cridencials, 2)Ask Database if they are correct, and 3)send back current SessionID char(50)
-                case (uint)Auth.REQUEST.PACKET_SESSION_REQUEST:
+                case Auth.REQUEST.PACKET_SESSION_REQUEST:
+                    current.request(request);
                     //1)
                     getCredentials(ref recBuf, ref current);
                     //2)
@@ -56,14 +63,14 @@ namespace TroyAuthServer
                         Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Green);
                     else
                         Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Red);
-                    //Main doesnt care 
+                    current.Status = Auth.STATUS.STATUS_SERVED;
                     return request;
-                    
                     
                 //Request didnt match Any Enum provided
                 //in Auth Class...
                 default:
-                    return (uint)Auth.REQUEST.PACKET_WRONG_REQUEST;
+                    current.request(Auth.REQUEST.PACKET_WRONG_REQUEST);
+                    return request;
             }
         }
 

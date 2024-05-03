@@ -5,9 +5,10 @@ namespace TroyAuthServer
 {
     static class Auth
     {
-        public const float SERVER_VERSION       = 0.1f;     //Server Version
-        public const float PACKET_VERSION       = 0.1f;     //Packet version the server is using
-        public const int CONFIG_SIZE            = 6;        //Size of configuration file        
+        public const float      SERVER_VERSION       = 0.1f;     //Server Version
+        public const float      PACKET_VERSION       = 0.1f;     //Packet version the server is using
+        public const float      TIME_FOR_REQUEST     = 0.15f;     //The maximum time the client has for sending request before dump
+        public const int        CONFIG_SIZE            = 6;      //Size of configuration file        
 
 
         public const int PORT                   = 1100;     //Server Port to listen to for the clients
@@ -15,9 +16,15 @@ namespace TroyAuthServer
         public const int BUFFER_SIZE            = 2048;     //Client Buffer Size 
 
         
-        public const int STATUS_UNVERIFIED      = 0;        //Client awaits Authentication process
-        public const int STATUS_LOGGED          = 1;        //Client was verified and connection is trusted 
-        public const int STATUS_WORLD           = 2;        //Client entered the world 
+
+        //Client Status for the Client Iterator
+        public enum STATUS : uint
+        {
+            STATUS_NONE,                  //Client didnt sent anything yet
+            STATUS_REQUESTED,             //Client requested, but was not served yet
+            STATUS_SERVED                 //Client served, safe to close connection and dispose
+        }
+
         
 
         //Packet Type from packet's Header

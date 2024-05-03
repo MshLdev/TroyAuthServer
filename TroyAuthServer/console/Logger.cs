@@ -73,7 +73,7 @@ namespace TroyAuthServer
             Printer.TypeLine("[System::", ConsoleColor.DarkYellow);
             Printer.TypeLine(DateAndTime.Now.ToLongTimeString(), ConsoleColor.DarkBlue);
             Printer.TypeLine("]", ConsoleColor.DarkYellow);
-            Printer.TypeLine("->Request was Damaged!!.\n", ConsoleColor.Yellow);
+            Printer.TypeLine("->Request was Damaged!!.\n" + info, ConsoleColor.Yellow);
         }
     }
 }

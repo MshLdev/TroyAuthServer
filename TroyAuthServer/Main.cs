@@ -1,6 +1,9 @@
 ﻿using System.Net;
+using System.Diagnostics;
 using System.Net.Sockets;
 using Microsoft.VisualBasic;
+using System.Timers;
+using System.Security.Cryptography;
 
 namespace TroyAuthServer
 {
@@ -10,7 +13,8 @@ namespace TroyAuthServer
         private static readonly List<Client> clients = new List<Client>();
         private static uint connectionCount = 0;
         private static dbController db = new dbController();
-
+        private static Stopwatch sw = new Stopwatch();         //time calc
+        private static string inputcommand = "";
 
 
         static void Main()
@@ -21,10 +25,10 @@ namespace TroyAuthServer
             
             //Setup Socket infrastructure
             if (SetupServer())
-            //Block the server
-                Console.ReadLine(); 
-                //Parent.connect(); for now connection with Parent might not be needed, this doesnt really help by any means tbh. hmmm 
-            //CleanUp
+                ClientLoop();
+                
+                
+            Console.ReadLine();
             Console.WriteLine("Closing, Cleaning and quiting...");
             CloseAllSockets();
             Printer.Write("Server Closed, good bye!\n",ConsoleColor.Green );
@@ -139,45 +143,11 @@ namespace TroyAuthServer
                 return;
             }
 
-
-            ///Here we have to manage the connections, packets will be handled
-            ///By Packet Object, Here we only manage Key aspects
-            switch(Packet.clientRecived(ref current, ref db)) 
-            {
-
-                // Client requested something
-                //Packet class aready responded
-                //nothing else needs to be done at this time
-                case (uint)Auth.REQUEST.PACKET_SESSION_REQUEST:
-                    Logger.logServedEvent(current.session);
-                    closeConn(current);
-                    break;
-
-
-                //Propably the Client closed the socket
-                //on his site, we will confirm this in the next callBack to make sure
-                case (uint)Auth.REQUEST.PACKET_EMPTY_REQUEST:
-                    Logger.logEmptyEvent();
-                    closeConn(current);
-                    break;
-
-
-                //Packet size doesnt match the declared value
-                case (uint)Auth.REQUEST.PACKET_DAMAGED_REQUEST:
-                    Logger.logDamagedEvent("");
-                    closeConn(current);
-                    break;
-
-
-                //Client sent invalid packet
-                //or packet was damaged 
-                //thats sus... -.-
-                case (uint)Auth.REQUEST.PACKET_WRONG_REQUEST:
-                    Logger.logWrongEvent(" |" + current.lastRequest);
-                    closeConn(current);
-                    break;
-            }
+            //Analize Packet
+            Packet.clientRecived(ref current, ref db); 
         }
+
+
 
         private static void closeConn(Client cnn)
         {
@@ -185,7 +155,27 @@ namespace TroyAuthServer
             cnn.socket.Shutdown(SocketShutdown.Both);
             cnn.socket.Close();
             clients.Remove(cnn);
-            //Printer.Write("\nClient[" + cnn.clientID + "] closed connection", ConsoleColor.DarkGreen);
+            //Printer.Write("\nClient[" + cnn.ID + "] closed connection", ConsoleColor.DarkGreen);
+            Printer.Write("\nClient[" + cnn.ID + "] closed connection [main.closeconn()]", ConsoleColor.DarkGreen);
         }
+
+
+
+          private static async void ClientLoop()
+            {
+                while (true)
+                {
+                    await Task.Yield();
+                    //Check every connection for Action needed
+                    foreach (Client client in clients.ToList())
+                    {
+                        //Client can be disconnected now   
+                        if(client.Status == Auth.STATUS.STATUS_SERVED)  
+                            closeConn(client);
+                        client.timeOut(Timer.calculate());
+                    }
+                    await Task.Delay(35);
+                }
+            }
     }
 }
