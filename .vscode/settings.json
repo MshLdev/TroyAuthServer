@@ -1,4 +1,4 @@
 {
-    "dotnet.defaultSolution": "TroyServer.sln"
+    "dotnet.defaultSolution": "TroyAuthServer.sln"
     
 }

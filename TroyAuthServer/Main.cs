@@ -5,7 +5,7 @@ using Microsoft.VisualBasic;
 using System.Timers;
 using System.Security.Cryptography;
 
-namespace TroyServer
+namespace TroyAuthServer
 {
     class Program
     {
@@ -14,14 +14,14 @@ namespace TroyServer
         private static uint connectionCount = 0;
         private static dbController db = new dbController();
         private static Stopwatch sw = new Stopwatch();         //time calc
-
+        private static string inputcommand = "";
 
 
         static void Main()
         {   
             Console.Clear();
-            Server.loadCfg();
-            Console.Title = "TroyAuthServer v"+ Server.SERVER_VERSION + " --- (" + Server.serverName + ")";
+            Auth.loadCfg();
+            Console.Title = "TroyAuthServer v"+ Auth.SERVER_VERSION + " --- (" + Auth.serverName + ")";
             
             //Setup Socket infrastructure
             if (SetupServer())
@@ -42,7 +42,7 @@ namespace TroyServer
             {
                 if(db.connect())
                 {
-                    Printer.Write(Server.serverDbVersion + " Online, Connection Opened",ConsoleColor.Green );
+                    Printer.Write(Auth.serverDbVersion + " Online, Connection Opened",ConsoleColor.Green );
                     return true;
                 }
                 else
@@ -65,7 +65,7 @@ namespace TroyServer
         private static bool SetupServer()
         {
             //Console.WriteLine("Setting up server Socket...");
-            serverSocket.Bind(new IPEndPoint(IPAddress.Any, Server.PORT));
+            serverSocket.Bind(new IPEndPoint(IPAddress.Any, Auth.PORT));
             //Console.WriteLine("Listening...");
             serverSocket.Listen(0);
             //Console.WriteLine("Callback setup...");
@@ -74,7 +74,7 @@ namespace TroyServer
             if(!SetupDB())
                 return false;
 
-            string info = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> ***  AuthService Server Online(PORT:"+ Server.PORT +")  ***";
+            string info = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> ***  AuthService Server Online(PORT:"+ Auth.PORT +")  ***";
             Printer.Write(info + "\n", ConsoleColor.Green );
             Logger.genericfileLog(info);
             return true;
@@ -114,7 +114,7 @@ namespace TroyServer
             }
 
            clients.Add(nClient);
-           nClient.socket.BeginReceive(nClient.buffer, 0, Server.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, nClient);
+           nClient.socket.BeginReceive(nClient.buffer, 0, Auth.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, nClient);
            serverSocket.BeginAccept(AcceptCallback, null);
         }
 
@@ -169,10 +169,9 @@ namespace TroyServer
                     //Check every connection for Action needed
                     foreach (Client client in clients.ToList())
                     {
-                        //Check if Client still has a right to be connected
-                        if(!client.isAuthorized())  
+                        //Client can be disconnected now   
+                        if(client.Status == Auth.STATUS.STATUS_SERVED)  
                             closeConn(client);
-                        //Calculate TimeOut if need be
                         client.timeOut(Timer.calculate());
                     }
                     await Task.Delay(35);

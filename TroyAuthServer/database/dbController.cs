@@ -1,14 +1,14 @@
 using MySqlConnector;
 using Dapper;
 
-namespace TroyServer
+namespace TroyAuthServer
 {
     class dbController
     {
 
 
 
-        MySqlConnection connection = new MySqlConnection("Server=localhost;User ID=" + Server.serverDbLogin +";Password=" + Server.serverDbPass + ";Database=db_Troy");
+        MySqlConnection connection = new MySqlConnection("Server=localhost;User ID=" + Auth.serverDbLogin +";Password=" + Auth.serverDbPass + ";Database=db_Troy");
 
 
         //Make connection to the database

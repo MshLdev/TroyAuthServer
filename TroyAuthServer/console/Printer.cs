@@ -1,6 +1,6 @@
 
 
-namespace TroyServer
+namespace TroyAuthServer
 {
     class Printer
     {
