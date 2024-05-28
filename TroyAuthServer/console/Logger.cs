@@ -5,25 +5,25 @@ namespace TroyAuthServer
     class Logger
     {
 
-        static string path = "LOG/log.txt";
+        //static string path = "LOG/log.txt";
 
         
         public static void genericfileLog(string logmsg)
         {
-            System.IO.File.AppendAllLines(path, new string[]{logmsg});
+            //System.IO.File.AppendAllLines(path, new string[]{logmsg});
         }
 
         public static void systemfileLog(string logmsg)
         {
-            string sysLog = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] ->" + logmsg;
-            System.IO.File.AppendAllLines(path, new string[]{logmsg});
+            //string sysLog = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] ->" + logmsg;
+            //System.IO.File.AppendAllLines(path, new string[]{logmsg});
         }
 
 
         public static void logServedEvent(string info)
         {
-            string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Served Event. " + info;
-            genericfileLog(logmsg);
+            //string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Served Event. " + info;
+            //genericfileLog(logmsg);
 
             if(Auth.isLogger == "false")
                 return;
@@ -37,8 +37,8 @@ namespace TroyAuthServer
 
         public static void logEmptyEvent()
         {
-            string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Asked Empty Request.";
-            genericfileLog(logmsg);
+            //string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> User Asked Empty Request.";
+            //genericfileLog(logmsg);
             if(Auth.isLogger == "false")
                 return;
 
@@ -51,8 +51,8 @@ namespace TroyAuthServer
 
         public static void logWrongEvent(string info)
         {
-            string logmsg = "[[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Request not listed on Auth Enum! REQ.ID == ." + info;
-            genericfileLog(logmsg);
+            //string logmsg = "[[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Request not listed on Auth Enum! REQ.ID == ." + info;
+            //genericfileLog(logmsg);
             if(Auth.isLogger == "false")
                 return;
 
@@ -65,8 +65,8 @@ namespace TroyAuthServer
 
         public static void logDamagedEvent(string info)
         {
-            string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Packet was Damaged " + info;
-            genericfileLog(logmsg);
+            //string logmsg = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> Packet was Damaged " + info;
+            //genericfileLog(logmsg);
             if(Auth.isLogger == "false")
                 return;
 

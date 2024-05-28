@@ -11,12 +11,15 @@ namespace TroyAuthServer
         private static readonly Socket serverSocket         = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private static readonly List<Client> clients        = new List<Client>();
         private static dbController db                      = new dbController();    
-        private static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
-        private static int numRequest                       = 0;                    //ammount of requests in the last second
         private static bool terminate                       = false;                //Bool for terminating the Server, tries to make it safe and clean
         private static bool cleaned                         = false;                //Final close signal
         private static bool isWorking                       = false;                //Blocker for time of main loop cleanups
 
+        private static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
+        private static int numRequest                       = 0;                    //ammount of requests in the last second
+        public static int numRequestEmpty                   = 0;                    //ammount of empty requests in the last second
+        public static int numRequestWrong                   = 0;                    //ammount of wrong requests in the last second
+        public static int numTerminatedConnection           = 0;                    //ammount of connections closed frocefuly
         static void Main()
         {   
             Console.Clear();
@@ -125,6 +128,7 @@ namespace TroyAuthServer
 
         private static void ReceiveCallback(IAsyncResult AR)
         {
+            numRequest ++;
             Client? current = (Client?)AR.AsyncState;
             if(current == null)
             {
@@ -140,7 +144,8 @@ namespace TroyAuthServer
             }
             catch (SocketException)
             {
-                Printer.Write("Client forcefully disconnected", ConsoleColor.Yellow);
+                numTerminatedConnection ++;
+                //Printer.Write("Client forcefully disconnected", ConsoleColor.Yellow);
                 // Don't shutdown because the socket may be disposed and its disconnected anyway.
                 current.Status = Auth.STATUS.STATUS_SERVED;
                 return;
@@ -148,7 +153,6 @@ namespace TroyAuthServer
 
             //Analize Packet
             Packet.clientRecived(ref current, ref db); 
-            numRequest ++;
         }
 
 
@@ -182,10 +186,13 @@ namespace TroyAuthServer
                     requestInterval -= clientloopTimer.deltaTime;
                     if(requestInterval < 0f)
                     {
-                        Printer.Write(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest, ConsoleColor.DarkBlue);
+                        Printer.TypeLine($"[{DateAndTime.Now.ToLongTimeString()}]");
                         //Logger.genericfileLog(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest + "\n");
-                        requestInterval = 1f;
-                        numRequest = 0;
+                        requestInterval         = 1f;
+                        numRequest              = 0;
+                        numRequestEmpty         = 0;
+                        numRequestWrong         = 0;
+                        numTerminatedConnection = 0;
                     }
                     isWorking = true;
                     await Task.Yield();

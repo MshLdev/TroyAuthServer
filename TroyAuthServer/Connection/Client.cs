@@ -43,33 +43,6 @@ namespace TroyAuthServer
         }
 
 
-        public void request(Auth.REQUEST request)
-        {
-             switch(request) 
-            {
-                case Auth.REQUEST.PACKET_SESSION_REQUEST:
-                    Status = Auth.STATUS.STATUS_REQUESTED;
-                    break;
-                //Packet = NULL, dump the fucker
-                case (uint)Auth.REQUEST.PACKET_EMPTY_REQUEST:
-                    Logger.logEmptyEvent();
-                    Status = Auth.STATUS.STATUS_SERVED;
-                    break;
-                //Packet size doesnt match the declared value, dump the fucker
-                case Auth.REQUEST.PACKET_DAMAGED_REQUEST:
-                    Logger.logDamagedEvent(" from client.cs/Req");
-                    Status = Auth.STATUS.STATUS_SERVED;
-                    Console.Write("client status  = " + Status + ", isDb = " + isDbServerd);
-                    break;
-                //Invalid packet, dump the fucker
-                case Auth.REQUEST.PACKET_WRONG_REQUEST:
-                    Logger.logWrongEvent(" |" + lastRequest);
-                    Status = Auth.STATUS.STATUS_SERVED;
-                    break;
-            }
-            //Printer.Write("Exited request with stauts -> " + Status, ConsoleColor.Yellow);
-        }
-
 
         public bool trySend(byte[] data)
         {

@@ -15,7 +15,8 @@ namespace TroyAuthServer
             //nothing left to do....
             if(current.buffSize < 10)   
             {
-                current.request(Auth.REQUEST.PACKET_EMPTY_REQUEST);
+                Program.numRequestEmpty ++;
+                current.Status = Auth.STATUS.STATUS_SERVED;
                 return Auth.REQUEST.PACKET_EMPTY_REQUEST;
             }
                 
@@ -33,7 +34,8 @@ namespace TroyAuthServer
             //Intended!!
             if(current.buffSize != sizeDeclared)
             {
-                current.request(Auth.REQUEST.PACKET_DAMAGED_REQUEST);
+                Program.numRequestWrong ++;
+                current.Status = Auth.STATUS.STATUS_SERVED;
                 return Auth.REQUEST.PACKET_DAMAGED_REQUEST;
             }
                 
@@ -55,7 +57,7 @@ namespace TroyAuthServer
                     //Printer.Write(BitConverter.ToString(recBuf).Replace("-"," "), ConsoleColor.DarkMagenta);
 
                     current.isDbServerd = false; //Test mutex variable to make sure the client doesnt disapear in a meantine
-                    current.request(request);
+                    current.Status = Auth.STATUS.STATUS_REQUESTED;
                     //1)
                     getCredentials(ref recBuf, ref current);
                     //2)
@@ -81,7 +83,8 @@ namespace TroyAuthServer
                 //Request didnt match Any Enum provided
                 //in Auth Class...
                 default:
-                    current.request(Auth.REQUEST.PACKET_WRONG_REQUEST);
+                    Program.numRequestWrong ++;
+                    current.Status = Auth.STATUS.STATUS_SERVED;
                     return request;
             }
         }
