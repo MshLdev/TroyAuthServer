@@ -1,21 +1,21 @@
 ﻿using System.Net;
-using System.Diagnostics;
 using System.Net.Sockets;
 using Microsoft.VisualBasic;
-using System.Timers;
-using System.Security.Cryptography;
+
 
 namespace TroyAuthServer
 {
     class Program
     {
-        private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        private static readonly List<Client> clients = new List<Client>();
-        private static uint connectionCount = 0;
-        private static dbController db = new dbController();
-        private static Stopwatch sw = new Stopwatch();         //time calc
-        private static string inputcommand = "";
-
+        
+        private static readonly Socket serverSocket         = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private static readonly List<Client> clients        = new List<Client>();
+        private static dbController db                      = new dbController();    
+        private static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
+        private static int numRequest                       = 0;                    //ammount of requests in the last second
+        private static bool terminate                       = false;                //Bool for terminating the Server, tries to make it safe and clean
+        private static bool cleaned                         = false;                //Final close signal
+        private static bool isWorking                       = false;                //Blocker for time of main loop cleanups
 
         static void Main()
         {   
@@ -28,9 +28,12 @@ namespace TroyAuthServer
                 ClientLoop();
                 
                 
+            //Block the main program Thread
             Console.ReadLine();
-            Console.WriteLine("Closing, Cleaning and quiting...");
-            CloseAllSockets();
+            terminate = true;
+            Printer.Write("Input Detected, waiting for the Cleanup....",ConsoleColor.DarkRed);
+            while(cleaned == false)
+                continue;
             Printer.Write("Server Closed, good bye!\n",ConsoleColor.Green );
         }
 
@@ -64,15 +67,16 @@ namespace TroyAuthServer
 
         private static bool SetupServer()
         {
+            //Connect to db
+            if(!SetupDB())
+                return false;
+          
             //Console.WriteLine("Setting up server Socket...");
             serverSocket.Bind(new IPEndPoint(IPAddress.Any, Auth.PORT));
             //Console.WriteLine("Listening...");
             serverSocket.Listen(0);
             //Console.WriteLine("Callback setup...");
             serverSocket.BeginAccept(AcceptCallback, null);
-            //Connect to db
-            if(!SetupDB())
-                return false;
 
             string info = "[System ::" + DateAndTime.Now.ToLongDateString() + " :: " +DateAndTime.Now.ToShortTimeString()+  "] -> ***  AuthService Server Online(PORT:"+ Auth.PORT +")  ***";
             Printer.Write(info + "\n", ConsoleColor.Green );
@@ -87,10 +91,7 @@ namespace TroyAuthServer
         {
             //Console.WriteLine("Closing all sockets(" + clients.Count() +")...");
             foreach (Client client in clients)
-            {
-                client.socket.Shutdown(SocketShutdown.Both);
-                client.socket.Close();
-            }
+                closeConn(client);
             //ERROR - Closing this casuing Exeption, since at this point all the resources are already released!!!!!
             //serverSocket.Close();
             db.close();
@@ -99,8 +100,8 @@ namespace TroyAuthServer
 
         private static void AcceptCallback(IAsyncResult AR)
         {
-            Client nClient = new Client(connectionCount);
-            connectionCount ++;
+            Client nClient = new Client(numConnections);
+            numConnections ++;
             //Socket socket;
 
             try
@@ -113,6 +114,9 @@ namespace TroyAuthServer
                 return;
             }
 
+            while (isWorking)
+                continue;
+                //Console.Write("Thread busy, waiting for oportunity to get into the iterator!!\n");
            clients.Add(nClient);
            nClient.socket.BeginReceive(nClient.buffer, 0, Auth.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, nClient);
            serverSocket.BeginAccept(AcceptCallback, null);
@@ -138,44 +142,68 @@ namespace TroyAuthServer
             {
                 Printer.Write("Client forcefully disconnected", ConsoleColor.Yellow);
                 // Don't shutdown because the socket may be disposed and its disconnected anyway.
-                current.socket.Close(); 
-                clients.Remove(current);
+                current.Status = Auth.STATUS.STATUS_SERVED;
                 return;
             }
 
             //Analize Packet
             Packet.clientRecived(ref current, ref db); 
+            numRequest ++;
         }
 
 
-
+        //WARNING:::
+        //Under high load the Close conn tries to close sockets
+        //that have already been disposed...
         private static void closeConn(Client cnn)
         {
-            // Always Shutdown before closing
-            cnn.socket.Shutdown(SocketShutdown.Both);
-            cnn.socket.Close();
+            cnn.tryClose();         //So my guess is that, when the client dc's forcefuly the socked is being closed by the Class itself, and thats why we get that error...
             clients.Remove(cnn);
             //Printer.Write("\nClient[" + cnn.ID + "] closed connection", ConsoleColor.DarkGreen);
-            Printer.Write("\nClient[" + cnn.ID + "] closed connection [main.closeconn()]", ConsoleColor.DarkGreen);
+            //Printer.Write("\nClient[" + cnn.ID + "] closed connection [main.closeconn()]", ConsoleColor.DarkGreen);
         }
 
 
 
           private static async void ClientLoop()
             {
+                Timer clientloopTimer = new Timer();
+                float requestInterval = 1f;
+
                 while (true)
                 {
+                    if(terminate)
+                    {
+                        Printer.Write("Stopping Main Loop...", ConsoleColor.DarkGreen);
+                        break;
+                    }
+
+                    clientloopTimer.calculate();
+                    requestInterval -= clientloopTimer.deltaTime;
+                    if(requestInterval < 0f)
+                    {
+                        Printer.Write(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest, ConsoleColor.DarkBlue);
+                        //Logger.genericfileLog(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest + "\n");
+                        requestInterval = 1f;
+                        numRequest = 0;
+                    }
+                    isWorking = true;
                     await Task.Yield();
                     //Check every connection for Action needed
                     foreach (Client client in clients.ToList())
                     {
                         //Client can be disconnected now   
-                        if(client.Status == Auth.STATUS.STATUS_SERVED)  
+                        if(client.Status == Auth.STATUS.STATUS_SERVED && client.isDbServerd)  
                             closeConn(client);
-                        client.timeOut(Timer.calculate());
+                        client.timeOut(clientloopTimer.deltaTime);
                     }
-                    await Task.Delay(35);
+                    isWorking = false;
+                    await Task.Delay(50);
                 }
+
+                Printer.Write("Exiting LoopFunction...", ConsoleColor.DarkGreen);
+                CloseAllSockets();
+                cleaned = true;
             }
     }
 }

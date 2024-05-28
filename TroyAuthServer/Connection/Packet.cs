@@ -10,6 +10,7 @@ namespace TroyAuthServer
         //Whenever a new Packet has been recieved to the client
         public static Auth.REQUEST clientRecived(ref Client current,ref dbController db)
         {
+
             //Packet was empty somehow
             //nothing left to do....
             if(current.buffSize < 10)   
@@ -51,19 +52,30 @@ namespace TroyAuthServer
                 //Client requested SessionID
                 //we need to 1)recive login cridencials, 2)Ask Database if they are correct, and 3)send back current SessionID char(50)
                 case Auth.REQUEST.PACKET_SESSION_REQUEST:
+                    //Printer.Write(BitConverter.ToString(recBuf).Replace("-"," "), ConsoleColor.DarkMagenta);
+
+                    current.isDbServerd = false; //Test mutex variable to make sure the client doesnt disapear in a meantine
                     current.request(request);
                     //1)
                     getCredentials(ref recBuf, ref current);
                     //2)
-                    current.session = db.getUserSession(current.login, current.password);
+                    
+                    lock (db)
+                        current.session = db.getUserSession(current.login, current.password);
                     //3)
-                    current.socket.Send(Encoding.ASCII.GetBytes(current.session));
+                    if(!current.trySend(Encoding.ASCII.GetBytes(current.session)))
+                    {
+                        //We must be disposed at this point, so no point accessing anything here
+                        return request;
+                    }
+                        
                     //Correct session has 50 bytes
-                    if (current.session.Length == 50)
-                        Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Green);
-                    else
-                        Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Red);
+                    //if (current.session.Length == 50)
+                        //Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Green);
+                    //else
+                        //Printer.Write("\nsessionID -> " + current.session, ConsoleColor.Red);
                     current.Status = Auth.STATUS.STATUS_SERVED;
+                    current.isDbServerd = true;
                     return request;
                     
                 //Request didnt match Any Enum provided

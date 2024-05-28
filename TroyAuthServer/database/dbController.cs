@@ -8,8 +8,8 @@ namespace TroyAuthServer
 
 
 
-        MySqlConnection connection = new MySqlConnection("Server=localhost;User ID=" + Auth.serverDbLogin +";Password=" + Auth.serverDbPass + ";Database=db_Troy");
-
+        MySqlConnection connection          = new MySqlConnection("Server=localhost;User ID=" + Auth.serverDbLogin +";Password=" + Auth.serverDbPass + ";Database=db_Troy");
+        public bool connectionoccupied      = false;    //if we get more requests per second, some of them will have to wait for their turn
 
         //Make connection to the database
         public bool connect()
@@ -46,24 +46,18 @@ namespace TroyAuthServer
         }
 
 
-
-
-        public DBOuser? getUserDBO(string login, string password)
-        {
-            string query = "SELECT * FROM users where Login = '"+ login +"' AND Password = '" + password + "';";
-            List<DBOuser> result = connection.Query<DBOuser>(query).ToList();
-            return result[0];
-        }
-
-
         public string getUserSession(string login, string password)
         {
             string query = "SELECT * FROM users where Login = '"+ login +"' AND Password = '" + password + "';";
             List<DBOuser> result = connection.Query<DBOuser>(query).ToList();
             if (result.Count == 1)
+            {
                 return result[0].SessionKey;
+            }
             else
+            {
                 return "AUTH.ERROR->[2137] -- Wrong Login or Password ";
+            }
         }
     }
 }
