@@ -1,5 +1,7 @@
 using System.Text;
 using System.Security.Cryptography;
+using System.Net;
+using System.Net.Sockets;
 
 
 
@@ -64,6 +66,12 @@ namespace TroyAuthServer
                     
                     lock (db)
                         current.session = db.getUserSession(current.login, current.password);
+                    //If session shorter than 50 the login was failed and this is not secure!!
+                    if(current.session.Length < 50 && current.socket.RemoteEndPoint != null)
+                    {
+                        string addr = ((IPEndPoint)current.socket.RemoteEndPoint).Address.ToString();
+                        Security.wrongLogin(addr);
+                    }
                     //3)
                     if(!current.trySend(Encoding.ASCII.GetBytes(current.session)))
                     {

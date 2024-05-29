@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 
 
@@ -15,11 +16,13 @@ namespace TroyAuthServer
         private static bool cleaned                         = false;                //Final close signal
         private static bool isWorking                       = false;                //Blocker for time of main loop cleanups
 
-        private static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
-        private static int numRequest                       = 0;                    //ammount of requests in the last second
+        public static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
+        public static int numRequest                       = 0;                    //ammount of requests in the last second
         public static int numRequestEmpty                   = 0;                    //ammount of empty requests in the last second
         public static int numRequestWrong                   = 0;                    //ammount of wrong requests in the last second
         public static int numTerminatedConnection           = 0;                    //ammount of connections closed frocefuly
+        public static int numTimeouts                       = 0;                    //ammount of connections closed by time out
+        public static int numOverload                       = 0;                    //ammount of connections that might be considered attacks
         static void Main()
         {   
             Console.Clear();
@@ -116,6 +119,21 @@ namespace TroyAuthServer
             {
                 return;
             }
+            if(nClient.socket.RemoteEndPoint == null)
+                return;
+                
+            //Get the remote adress, and check if there is any 
+            //suss behaviour over there..
+            string addr = ((IPEndPoint)nClient.socket.RemoteEndPoint).Address.ToString();
+            if(!Security.verifyAdress(addr))
+            {
+                //Too many requests!!!
+                numOverload ++;
+                nClient.tryClose();
+                serverSocket.BeginAccept(AcceptCallback, null);
+                return;
+            }
+                
 
             while (isWorking)
                 continue;
@@ -172,31 +190,26 @@ namespace TroyAuthServer
           private static async void ClientLoop()
             {
                 Timer clientloopTimer = new Timer();
-                float requestInterval = 1f;
+                float requestInterval = 0.5f;
 
                 while (true)
                 {
+                    //Do Timings and Logs
+                    clientloopTimer.calculate();
+                    requestInterval -= clientloopTimer.deltaTime;
+                    Security.SecurityTick(clientloopTimer.deltaTime);
+                    Logger.LogStatus(ref requestInterval);
+                    //Check for termination
                     if(terminate)
                     {
                         Printer.Write("Stopping Main Loop...", ConsoleColor.DarkGreen);
                         break;
                     }
-
-                    clientloopTimer.calculate();
-                    requestInterval -= clientloopTimer.deltaTime;
-                    if(requestInterval < 0f)
-                    {
-                        Printer.TypeLine($"[{DateAndTime.Now.ToLongTimeString()}]");
-                        //Logger.genericfileLog(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest + "\n");
-                        requestInterval         = 1f;
-                        numRequest              = 0;
-                        numRequestEmpty         = 0;
-                        numRequestWrong         = 0;
-                        numTerminatedConnection = 0;
-                    }
+                    
+                    
+                    //Check every connection for Action needed + cleanup
                     isWorking = true;
                     await Task.Yield();
-                    //Check every connection for Action needed
                     foreach (Client client in clients.ToList())
                     {
                         //Client can be disconnected now   

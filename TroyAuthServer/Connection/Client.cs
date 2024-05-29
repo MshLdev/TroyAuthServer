@@ -38,7 +38,8 @@ namespace TroyAuthServer
             if (NullBuffTime >= Auth.TIME_FOR_REQUEST && Status != Auth.STATUS.STATUS_SERVED)
             {
                 Status = Auth.STATUS.STATUS_SERVED;       //Client Timed out, so there is nothind for them here...
-                Printer.Write("\nClient[" + ID + "] Timedout", ConsoleColor.DarkGreen);
+                Program.numTimeouts ++;
+                //Printer.Write("\nClient[" + ID + "] Timedout", ConsoleColor.DarkGreen);
             }
         }
 

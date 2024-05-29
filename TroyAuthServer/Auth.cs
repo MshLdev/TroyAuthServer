@@ -5,9 +5,9 @@ namespace TroyAuthServer
 {
     static class Auth
     {
-        public const float      SERVER_VERSION       = 0.3f;     //Server Version
-        public const float      PACKET_VERSION       = 0.1f;     //Packet version the server is using
-        public const float      TIME_FOR_REQUEST     = 0.9f;     //The maximum time the client has for sending request before dump
+        public const float      SERVER_VERSION       = 0.4f;     //Server Version
+        public const float      PACKET_VERSION       = 0.4f;     //Packet version the server is using
+        public const float      TIME_FOR_REQUEST     = 0.1f;     //The maximum time the client has for sending request before dump
         public const int        CONFIG_SIZE            = 6;      //Size of configuration file        
 
 
