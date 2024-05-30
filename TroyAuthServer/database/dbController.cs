@@ -59,5 +59,32 @@ namespace TroyAuthServer
                 return "AUTH.ERROR->[2137] -- Wrong Login or Password ";
             }
         }
+        
+
+        public bool SetupDB()
+        {
+            //Try to establish connection with the db
+            while(true)
+            {
+                if(connect())
+                {
+                    Printer.Write(Auth.serverDbVersion + " Online, Connection Opened",ConsoleColor.Green );
+                    return true;
+                }
+                else
+                {
+                    Printer.Write("Retry?? (Y/N)",ConsoleColor.Yellow );
+                    string? answer = Console.ReadLine();
+                    if(answer != null && answer.ToLower() == "y")
+                    {
+                        Console.WriteLine("Retrying Database Setup...");
+                        continue;
+                    }
+                        
+                    else
+                        return false;
+                }
+            }
+        }
     }
 }

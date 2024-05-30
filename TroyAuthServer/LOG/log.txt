@@ -1,40 +1,33 @@
-
-[System ::02 May 2024 :: 01:34] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::02 May 2024 :: 01:53] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::28 May 2024 :: 18:37] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::28 May 2024 :: 18:41] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::28 May 2024 :: 20:26] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::28 May 2024 :: 20:27] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:27] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:30] -> ***  AuthService Server Online(PORT:1100)  ***
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:31] -> Packet was Damaged  from client.cs/Req
-[System ::28 May 2024 :: 20:32] -> ***  AuthService Server Online(PORT:1100)  ***
+[System ::29 May 2024 :: 04:04] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:05:07]  -- num Requests = 1(0/s),  POTENTIAL ATTACKS = 0,  num Empty = 0,  num Damaged = 0
+[04:05:12]  -- num Requests = 2(0/s),  POTENTIAL ATTACKS = 0,  num Empty = 0,  num Damaged = 0
+[04:05:17]  -- num Requests = 3(0/s),  POTENTIAL ATTACKS = 0,  num Empty = 0,  num Damaged = 0
+[04:05:22]  -- num Requests = 2(0/s),  POTENTIAL ATTACKS = 0,  num Empty = 0,  num Damaged = 0
+[04:05:27]  -- num Requests = 1(0/s),  POTENTIAL ATTACKS = 2,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:10] -> ***  AuthService Server Online(PORT:1100)  ***
+[System ::29 May 2024 :: 04:15] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:15:44]  -- num Requests = 2(0/s),  POTENTIAL ATTACKS = 0,  num Empty = 0,  num Damaged = 0
+[04:15:49]  -- num Requests = 7(1/s),  POTENTIAL ATTACKS = 35,  num Empty = 0,  num Damaged = 0
+[04:15:54]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 53,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:18] -> ***  AuthService Server Online(PORT:1100)  ***
+[System ::29 May 2024 :: 04:19] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:19:09]  -- num Requests = 7(1/s),  POTENTIAL ATTACKS = 41,  num Empty = 0,  num Damaged = 0
+[04:19:14]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 108,  num Empty = 0,  num Damaged = 0
+[04:19:19]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 146,  num Empty = 0,  num Damaged = 0
+[04:19:24]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 182,  num Empty = 0,  num Damaged = 0
+[04:19:29]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 246,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:19] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:19:36]  -- num Requests = 8(1/s),  POTENTIAL ATTACKS = 118,  num Empty = 0,  num Damaged = 0
+[04:19:41]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 323,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:20] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:20:07]  -- num Requests = 8(1/s),  POTENTIAL ATTACKS = 108,  num Empty = 0,  num Damaged = 0
+[04:20:12]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 263,  num Empty = 0,  num Damaged = 0
+[04:20:17]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 296,  num Empty = 0,  num Damaged = 0
+[04:20:22]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 283,  num Empty = 0,  num Damaged = 0
+[04:20:27]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 271,  num Empty = 0,  num Damaged = 0
+[04:20:32]  -- num Requests = 0(0/s),  POTENTIAL ATTACKS = 184,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:24] -> ***  AuthService Server Online(PORT:1100)  ***
+[04:24:49]  -- num Requests = 9(1/s),  POTENTIAL ATTACKS = 19,  num Empty = 0,  num Damaged = 0
+[System ::29 May 2024 :: 04:25] -> ***  AuthService Server Online(PORT:1100)  ***
+[System ::29 May 2024 :: 04:26] -> ***  AuthService Server Online(PORT:1100)  ***
+[System ::29 May 2024 :: 04:27] -> ***  AuthService Server Online(PORT:1100)  ***

@@ -4,13 +4,19 @@ namespace TroyAuthServer
 {
     class Logger
     {
-
-        //static string path = "LOG/log.txt";
+        public static uint numConnections                   = 0;                    //ammount of connections recieved in the lifetime
+        public static int numRequest                        = 0;                    //ammount of requests in the last second
+        public static int numRequestEmpty                   = 0;                    //ammount of empty requests in the last second
+        public static int numRequestWrong                   = 0;                    //ammount of wrong requests in the last second
+        public static int numTerminatedConnection           = 0;                    //ammount of connections closed frocefuly
+        public static int numTimeouts                       = 0;                    //ammount of connections closed by time out
+        public static int numOverload                       = 0;                    //ammount of connections that might be considered attacks
+        static string path = "LOG/log.txt";
 
         
         public static void genericfileLog(string logmsg)
         {
-            //System.IO.File.AppendAllLines(path, new string[]{logmsg});
+            File.AppendAllLines(path, new string[]{logmsg});
         }
 
         public static void systemfileLog(string logmsg)
@@ -80,48 +86,50 @@ namespace TroyAuthServer
         {
             if(interval < 0f)
              {
+                if (numRequest > 0 ||  numOverload > 0)
+                    genericfileLog($"[{DateAndTime.Now.ToLongTimeString()}]  -- num Requests = { numRequest}({ numRequest/5}/s),  POTENTIAL ATTACKS = { numOverload},  num Empty = { numRequestEmpty},  num Damaged = { numRequestWrong}");
                 Printer.TypeLine($"[{DateAndTime.Now.ToLongTimeString()}]  --", ConsoleColor.DarkBlue);
-                Printer.TypeLine($" num Requests = {Program.numRequest}({Program.numRequest/5}/s)", ConsoleColor.DarkGreen);
-                if (Program.numRequestEmpty > 0)
+                Printer.TypeLine($" num Requests = { numRequest}({ numRequest/5}/s)", ConsoleColor.DarkGreen);
+                if ( numRequestEmpty > 0)
                 {
                     Printer.TypeLine($", ", ConsoleColor.DarkBlue);
-                    Printer.TypeLine($" num Empty = {Program.numRequestEmpty}", ConsoleColor.DarkRed);
+                    Printer.TypeLine($" num Empty = { numRequestEmpty}", ConsoleColor.DarkRed);
                 }
 
-                if (Program.numRequestWrong > 0)
+                if ( numRequestWrong > 0)
                 {
                     Printer.TypeLine($", ", ConsoleColor.DarkBlue);
-                    Printer.TypeLine($" num Damaged = {Program.numRequestWrong}", ConsoleColor.DarkRed);
+                    Printer.TypeLine($" num Damaged = { numRequestWrong}", ConsoleColor.DarkRed);
                 }
 
-                if (Program.numTerminatedConnection > 0)
+                if ( numTerminatedConnection > 0)
                 {
                     Printer.TypeLine($", ", ConsoleColor.DarkBlue);
-                    Printer.TypeLine($" num Termination = {Program.numTerminatedConnection}", ConsoleColor.Yellow);
+                    Printer.TypeLine($" num Termination = { numTerminatedConnection}", ConsoleColor.Yellow);
                 }
 
-                if (Program.numTimeouts > 0)
+                if ( numTimeouts > 0)
                 {
                     Printer.TypeLine($", ", ConsoleColor.DarkBlue);
-                    Printer.TypeLine($" num Timeouts = {Program.numTimeouts}", ConsoleColor.Yellow);
+                    Printer.TypeLine($" num Timeouts = { numTimeouts}", ConsoleColor.Yellow);
                 }
 
-                if (Program.numOverload > 0)
+                if ( numOverload > 0)
                 {
                      Printer.TypeLine($", ", ConsoleColor.DarkBlue);
-                     Printer.TypeLine($" POTENTIAL ATTACKS = {Program.numOverload}", ConsoleColor.DarkRed);
+                     Printer.TypeLine($" POTENCIAL ATTACKS = { numOverload}", ConsoleColor.DarkRed);
                 }
                  
                      Printer.TypeLine("\n", ConsoleColor.DarkRed);
                         
                   //Logger.genericfileLog(DateAndTime.Now.ToLongTimeString() + " total requests recived last second = " + numRequest + "\n");
                   interval                        = 5f;
-                  Program.numRequest              = 0;
-                  Program.numRequestEmpty         = 0;
-                  Program.numRequestWrong         = 0;
-                  Program.numTerminatedConnection = 0;
-                  Program.numTimeouts             = 0;
-                  Program.numOverload             = 0;
+                   numRequest              = 0;
+                   numRequestEmpty         = 0;
+                   numRequestWrong         = 0;
+                   numTerminatedConnection = 0;
+                   numTimeouts             = 0;
+                   numOverload             = 0;
             }
         }
     }

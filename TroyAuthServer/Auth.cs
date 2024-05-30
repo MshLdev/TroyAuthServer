@@ -67,7 +67,7 @@ namespace TroyAuthServer
                 serverDbPass    = lines[4].Substring(lines[2].IndexOf(":: ") + 3);
                 isLogger        = lines[5].Substring(lines[2].IndexOf(":: ") + 3);
                 Printer.Write("Config Loaded with [" + CONFIG_SIZE + "] arguments.", ConsoleColor.Green);
-                Printer.Write("Starting up The " + serverName + "'@'" + serverLocation + "\n", ConsoleColor.Yellow);
+                Printer.Write("Launching up The " + serverName + " @ " + serverLocation + "\n", ConsoleColor.Yellow);
             }
         }
     }

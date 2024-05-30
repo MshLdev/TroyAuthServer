@@ -14,15 +14,13 @@ namespace TroyAuthServer
         private static dbController db                      = new dbController();    
         private static bool terminate                       = false;                //Bool for terminating the Server, tries to make it safe and clean
         private static bool cleaned                         = false;                //Final close signal
-        private static bool isWorking                       = false;                //Blocker for time of main loop cleanups
+       // private static bool isWorking                       = false;                //Blocker for time of main loop cleanups
 
-        public static uint numConnections                  = 0;                    //ammount of connections recieved in the lifetime
-        public static int numRequest                       = 0;                    //ammount of requests in the last second
-        public static int numRequestEmpty                   = 0;                    //ammount of empty requests in the last second
-        public static int numRequestWrong                   = 0;                    //ammount of wrong requests in the last second
-        public static int numTerminatedConnection           = 0;                    //ammount of connections closed frocefuly
-        public static int numTimeouts                       = 0;                    //ammount of connections closed by time out
-        public static int numOverload                       = 0;                    //ammount of connections that might be considered attacks
+
+
+
+
+
         static void Main()
         {   
             Console.Clear();
@@ -44,37 +42,11 @@ namespace TroyAuthServer
         }
 
 
-        private static bool SetupDB()
-        {
-            //Try to establish connection with the db
-            while(true)
-            {
-                if(db.connect())
-                {
-                    Printer.Write(Auth.serverDbVersion + " Online, Connection Opened",ConsoleColor.Green );
-                    return true;
-                }
-                else
-                {
-                    Printer.Write("Retry?? (Y/N)",ConsoleColor.Yellow );
-                    string? answer = Console.ReadLine();
-                    if(answer != null && answer.ToLower() == "y")
-                    {
-                        Console.WriteLine("Retrying Database Setup...");
-                        continue;
-                    }
-                        
-                    else
-                        return false;
-                }
-            }
-        }
-
 
         private static bool SetupServer()
         {
             //Connect to db
-            if(!SetupDB())
+            if(!db.SetupDB())
                 return false;
           
             //Console.WriteLine("Setting up server Socket...");
@@ -106,8 +78,8 @@ namespace TroyAuthServer
 
         private static void AcceptCallback(IAsyncResult AR)
         {
-            Client nClient = new Client(numConnections);
-            numConnections ++;
+            Client nClient = new Client(Logger.numConnections);
+            Logger.numConnections ++;
             //Socket socket;
 
             try
@@ -128,15 +100,15 @@ namespace TroyAuthServer
             if(!Security.verifyAdress(addr))
             {
                 //Too many requests!!!
-                numOverload ++;
+                Logger.numOverload ++;
                 nClient.tryClose();
                 serverSocket.BeginAccept(AcceptCallback, null);
                 return;
             }
                 
 
-            while (isWorking)
-                continue;
+            //while (isWorking)
+                //continue;
                 //Console.Write("Thread busy, waiting for oportunity to get into the iterator!!\n");
            clients.Add(nClient);
            nClient.socket.BeginReceive(nClient.buffer, 0, Auth.BUFFER_SIZE, SocketFlags.None, ReceiveCallback, nClient);
@@ -146,7 +118,7 @@ namespace TroyAuthServer
 
         private static void ReceiveCallback(IAsyncResult AR)
         {
-            numRequest ++;
+            Logger.numRequest ++;
             Client? current = (Client?)AR.AsyncState;
             if(current == null)
             {
@@ -162,7 +134,7 @@ namespace TroyAuthServer
             }
             catch (SocketException)
             {
-                numTerminatedConnection ++;
+                Logger.numTerminatedConnection ++;
                 //Printer.Write("Client forcefully disconnected", ConsoleColor.Yellow);
                 // Don't shutdown because the socket may be disposed and its disconnected anyway.
                 current.Status = Auth.STATUS.STATUS_SERVED;
@@ -208,16 +180,19 @@ namespace TroyAuthServer
                     
                     
                     //Check every connection for Action needed + cleanup
-                    isWorking = true;
+                    //isWorking = true;
                     await Task.Yield();
-                    foreach (Client client in clients.ToList())
+                    lock(clients)
                     {
-                        //Client can be disconnected now   
-                        if(client.Status == Auth.STATUS.STATUS_SERVED && client.isDbServerd)  
-                            closeConn(client);
-                        client.timeOut(clientloopTimer.deltaTime);
+                        foreach (Client client in clients.ToList())
+                        {
+                            //Client can be disconnected now   
+                            if(client.Status == Auth.STATUS.STATUS_SERVED && client.isDbServerd)  
+                                closeConn(client);
+                            client.timeOut(clientloopTimer.deltaTime);
+                        }
                     }
-                    isWorking = false;
+                    //isWorking = false;
                     await Task.Delay(50);
                 }
 

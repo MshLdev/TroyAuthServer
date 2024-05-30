@@ -17,7 +17,7 @@ namespace TroyAuthServer
             //nothing left to do....
             if(current.buffSize < 10)   
             {
-                Program.numRequestEmpty ++;
+                Logger.numRequestEmpty ++;
                 current.Status = Auth.STATUS.STATUS_SERVED;
                 return Auth.REQUEST.PACKET_EMPTY_REQUEST;
             }
@@ -36,7 +36,7 @@ namespace TroyAuthServer
             //Intended!!
             if(current.buffSize != sizeDeclared)
             {
-                Program.numRequestWrong ++;
+                Logger.numRequestWrong ++;
                 current.Status = Auth.STATUS.STATUS_SERVED;
                 return Auth.REQUEST.PACKET_DAMAGED_REQUEST;
             }
@@ -91,7 +91,7 @@ namespace TroyAuthServer
                 //Request didnt match Any Enum provided
                 //in Auth Class...
                 default:
-                    Program.numRequestWrong ++;
+                    Logger.numRequestWrong ++;
                     current.Status = Auth.STATUS.STATUS_SERVED;
                     return request;
             }
