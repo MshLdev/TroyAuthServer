@@ -8,7 +8,7 @@ namespace TroyAuthServer
 
 
 
-        MySqlConnection connection          = new MySqlConnection("Server=localhost;User ID=" + Auth.serverDbLogin +";Password=" + Auth.serverDbPass + ";Database=db_Troy");
+        MySqlConnection connection          = new MySqlConnection("Server=localhost;User ID=" + Auth.serverDbLogin +";Password=" + Auth.serverDbPass + ";Database=db_troy");
         public bool connectionoccupied      = false;    //if we get more requests per second, some of them will have to wait for their turn
 
         //Make connection to the database
@@ -49,7 +49,23 @@ namespace TroyAuthServer
         public string getUserSession(string login, string password)
         {
             string query = "SELECT * FROM users where Login = '"+ login +"' AND Password = '" + password + "';";
-            List<DBOuser> result = connection.Query<DBOuser>(query).ToList();
+            List<DBOuser> result = new List<DBOuser>();
+            try
+            {
+                result = connection.Query<DBOuser>(query).ToList();
+            }
+            catch(Exception e)
+            {
+                Printer.Write("Exception encountered: " + e.Message, ConsoleColor.Red);
+                if (connect())
+                    result = connection.Query<DBOuser>(query).ToList();
+                else
+                {
+                    Printer.Write("Database refuses to cooperate!!!\n", ConsoleColor.Red);
+                    return "AUTH.ERROR->[9999] -- DB is not responding"; 
+                }   
+            }
+            
             if (result.Count == 1)
             {
                 return result[0].SessionKey;
